@@ -4,7 +4,6 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { SmtpMessage } from "../smtp-message";
 
 export default async function Signup(props: {
   searchParams: Promise<Message>;
@@ -20,7 +19,7 @@ export default async function Signup(props: {
 
   return (
     <>
-      <form className="flex flex-col min-w-64 max-w-64 mx-auto">
+      <form className="flex flex-col min-w-96 max-w-96 mx-auto border border-black-100 rounded-lg shadow-md p-8">
         <h1 className="text-2xl font-medium">Sign up</h1>
         <p className="text-sm text text-foreground">
           Already have an account?{" "}
@@ -39,13 +38,16 @@ export default async function Signup(props: {
             minLength={6}
             required
           />
+          <Label htmlFor="first-name">First Name</Label>
+          <Input name="first-name" placeholder="Your first name" required />
+          <Label htmlFor="last-name">Last Name</Label>
+          <Input name="last-name" placeholder="Your last name" required />
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">
             Sign up
           </SubmitButton>
           <FormMessage message={searchParams} />
         </div>
       </form>
-      <SmtpMessage />
     </>
   );
 }

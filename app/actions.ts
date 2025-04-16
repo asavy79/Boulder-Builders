@@ -8,6 +8,8 @@ import { redirect } from "next/navigation";
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const firstName = formData.get("first-name")?.toString();
+  const lastName = formData.get("last-name")?.toString();
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
@@ -23,6 +25,10 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+      },
       emailRedirectTo: `${origin}/auth/callback`,
     },
   });
@@ -53,7 +59,7 @@ export const signInAction = async (formData: FormData) => {
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
-  return redirect("/protected");
+  return redirect("/feed");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
