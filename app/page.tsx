@@ -16,7 +16,7 @@ export default async function Home() {
               Share projects, learn together, and build meaningful connections.
             </p>
             <button className="bg-emerald-600 text-white px-8 py-3 rounded-full font-medium 
-              hover:bg-emerald-700 transition-colors duration-200 inline-flex items-center gap-2">
+              hover:bg-emerald-700 transition-colors duration-200 inline-flex items-center gap-2 cursor-pointer">
               Join the Community
               <ArrowRightIcon className="w-5 h-5" />
             </button>
@@ -24,7 +24,7 @@ export default async function Home() {
         </div>
         
         {/* Abstract Background Pattern */}
-        <div className="absolute top-0 left-0 right-0 h-full opacity-10">
+        <div className="absolute top-0 left-0 right-0 h-full opacity-10 pointer-events-none">
           <div className="absolute transform rotate-45 -translate-x-1/2 -translate-y-1/2">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="w-64 h-64 border-2 border-emerald-500 rounded-lg absolute"

@@ -1,10 +1,10 @@
-import DeployButton from "@/components/deploy-button";
 import { EnvVarWarning } from "@/components/env-var-warning";
 import HeaderAuth from "@/components/header-auth";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { Geist } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import { SupabaseProvider } from "@/lib/supabase-context";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -21,15 +21,15 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-
+}) {
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-white text-gray-900">
+        <SupabaseProvider>
           <main className="min-h-screen flex flex-col items-center">
             <div className="flex-1 w-full flex flex-col gap-12 items-center">
               <nav className="w-full flex justify-center border-b border-emerald-100 h-16 bg-white sticky top-0 z-50 backdrop-blur-sm bg-white/80">
@@ -79,6 +79,7 @@ export default async function RootLayout({
               </footer>
             </div>
           </main>
+        </SupabaseProvider>
       </body>
     </html>
   );
