@@ -19,8 +19,8 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
       setLoading(false);
     });
 

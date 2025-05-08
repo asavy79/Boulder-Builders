@@ -6,6 +6,9 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import Link from "next/link";
+import {useEffect, useState} from "react";
+
+
 interface ProfileCardProps {
     user: User;
     stats?: {
@@ -17,6 +20,29 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ user, stats }: ProfileCardProps) {
     const userInitials = user.user_metadata?.first_name?.[0].toUpperCase() + user.user_metadata?.last_name?.[0].toUpperCase() || "U";
+
+    const [skills, setSkills] = useState<string[]>([]);
+
+
+    useEffect(() => {
+        const fetchSkills = async () => {
+            const response = await fetch("/api/users/skills", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+            if(!response.ok) {
+                console.error("Failed to fetch skills");
+                return;
+            }
+
+            const data = await response.json();
+            setSkills(data.map((skill: any) => skill.skill.name));  
+        }
+
+        fetchSkills();
+    }, [])
 
     return (
             <Card className="w-full max-w-md bg-white shadow-lg rounded-xl overflow-hidden">
@@ -58,11 +84,31 @@ export default function ProfileCard({ user, stats }: ProfileCardProps) {
                     </Badge>
                 </div>
                 <div className="flex justify-center gap-4">
-                    <Link href="/protected/reset-password">
+                    <Link href="/protected/profile">
                         <Button variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                            Reset Password
+                            Edit Profile
                         </Button>
                     </Link>
+                </div>
+                <div className="mt-6 border-t border-gray-100 pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Skills</h3>
+                        <span className="text-sm text-gray-500">{skills.length} skills</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {skills.map((skill, index) => (
+                            <Badge 
+                                key={index} 
+                                variant="secondary" 
+                                className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors duration-200 px-3 py-1"
+                            >
+                                {skill}
+                            </Badge>
+                        ))}
+                        {skills.length === 0 && (
+                            <p className="text-sm text-gray-500 italic">No skills added yet</p>
+                        )}
+                    </div>
                 </div>
             </CardContent>
         </Card>

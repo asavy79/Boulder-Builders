@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/utils/supabase/client-instance';
 import PostCard from '@/components/post-card';
 import FeedFilter from '@/components/feed-filter';
 import { Post } from '@/lib/types/post';
@@ -50,9 +50,6 @@ export default function Feed() {
   const [isLoading, setIsLoading] = useState(true);
 
 
-  // Initialize Supabase client (move to a separate utility file in production)
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, 
-                               process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -72,7 +69,7 @@ export default function Feed() {
     const subscription = supabase
       .channel('posts')
       .on('INSERT', payload => {
-        setPosts(current => [payload.new, ...current]);
+        setPosts(current => [payload.new as Post, ...current]);
       })
       .subscribe();
 
