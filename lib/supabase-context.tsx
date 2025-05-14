@@ -1,21 +1,22 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState } from "react";
+import supabase from "@/utils/supabase/client";
+import { User, SupabaseClient } from "@supabase/supabase-js";
 
 type SupabaseContextType = {
-  supabase: ReturnType<typeof createClient>;
+  supabase: SupabaseClient;
   user: User | null;
   loading: boolean;
 };
 
-const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);
+const SupabaseContext = createContext<SupabaseContextType | undefined>(
+  undefined
+);
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     // Get initial session
@@ -25,7 +26,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed!");
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -45,7 +49,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 export function useSupabase() {
   const context = useContext(SupabaseContext);
   if (context === undefined) {
-    throw new Error('useSupabase must be used within a SupabaseProvider');
+    throw new Error("useSupabase must be used within a SupabaseProvider");
   }
   return context;
-} 
+}

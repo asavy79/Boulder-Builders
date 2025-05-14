@@ -1,15 +1,32 @@
-import { useState } from 'react';
-import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
-import { Post } from '@/lib/types/post';
-import CommentSection from '@/components/comment-section';
+import { useState } from "react";
+import Image from "next/image";
+import { formatDistanceToNow } from "date-fns";
+import { Post } from "@/lib/types/post";
+import CommentSection from "@/components/comment-section";
 
 interface PostCardProps {
-  post: Post;
+  initialPost: Post;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ initialPost }: PostCardProps) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
+  const [post, setPost] = useState(initialPost);
+  console.log(post);
+
+  const handleCommentAdded = () => {
+    setPost((prev_post) => ({
+      ...prev_post,
+      comment_count: prev_post.comment_count + 1,
+    }));
+  };
+
+  const handleCommentDeleted = () => {
+    setPost((prev_post) => ({
+      ...prev_post,
+      comment_count: prev_post.comment_count - 1,
+    }));
+  };
 
   return (
     <article className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
@@ -23,16 +40,18 @@ export default function PostCard({ post }: PostCardProps) {
             className="rounded-full"
           /> */}
           <div className="ml-3">
-            <h3 className="font-medium text-gray-900">{post.user.name}</h3>
+            <h3 className="font-medium text-gray-900">
+              {post.profiles.first_name} {post.profiles.last_name}
+            </h3>
             <p className="text-sm text-gray-500">
               {formatDistanceToNow(new Date(post.created_at))} ago
             </p>
           </div>
         </div>
-        
+
         <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
         <p className="text-gray-700">{post.content}</p>
-        
+
         {post.image_url && (
           <div className="mt-4">
             <Image
@@ -44,21 +63,27 @@ export default function PostCard({ post }: PostCardProps) {
             />
           </div>
         )}
-        
+
         <div className="mt-4 flex items-center space-x-4">
-          <button 
+          <button
             onClick={() => setIsCommentsOpen(!isCommentsOpen)}
             className="text-sm text-emerald-600 hover:text-emerald-700"
           >
-            {post.comments.length} comments
+            {post.comment_count} comments
           </button>
           <button className="text-sm text-emerald-600 hover:text-emerald-700">
             Collaborate
           </button>
         </div>
       </div>
-      
-      {isCommentsOpen && <CommentSection postId={post.id} />}
+
+      {isCommentsOpen && (
+        <CommentSection
+          postId={post.id}
+          handleCommentAdded={handleCommentAdded}
+          handleCommentDeleted={handleCommentDeleted}
+        />
+      )}
     </article>
   );
 }

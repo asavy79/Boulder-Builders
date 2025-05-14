@@ -5,12 +5,13 @@ export interface Post {
     type: string;
     image_url?: string;
     created_at: string;
-    user: {
+    profiles: {
         id: string;
-        name: string;
-        avatar_url: string;
+        first_name: string;
+        last_name: string;
     };
-    comments: Comment[];
+    comment_count: number,
+    like_count: number,
 }
 
 export interface Comment {
@@ -19,4 +20,5 @@ export interface Comment {
     created_at: string;
     user_id: string;
     post_id: string;
+    parent_id: string | null;
 }
