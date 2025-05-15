@@ -4,8 +4,15 @@ import { useState, useEffect } from "react";
 import PostCard from "@/components/post-card";
 import FeedFilter from "@/components/feed-filter";
 import { Post } from "@/lib/types/post";
+import { stringifyResumeDataCache } from "next/dist/server/resume-data-cache/resume-data-cache";
 
-const AddPostForm = ({ onClose }: { onClose: () => void }) => {
+const AddPostForm = ({
+  onClose,
+  handleAddedPost,
+}: {
+  onClose: () => void;
+  handleAddedPost: (post: Post) => void;
+}) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState("projects");
@@ -25,7 +32,7 @@ const AddPostForm = ({ onClose }: { onClose: () => void }) => {
       return;
     }
     const data = await response.json();
-    console.log("Post added successfully:", data);
+    handleAddedPost(data.postData);
     onClose();
   };
 
@@ -133,6 +140,7 @@ export default function Feed() {
 
   const [showAddPostForm, setShowAddPostForm] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+
   function NewPostButton() {
     return (
       <button
@@ -157,6 +165,10 @@ export default function Feed() {
     }
 
     setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
+  const handleAddedPost = (post: Post) => {
+    setPosts((prevPosts) => [...prevPosts, post]);
   };
 
   useEffect(() => {
@@ -191,7 +203,10 @@ export default function Feed() {
         </div>
 
         {showAddPostForm && (
-          <AddPostForm onClose={() => setShowAddPostForm(false)} />
+          <AddPostForm
+            handleAddedPost={handleAddedPost}
+            onClose={() => setShowAddPostForm(false)}
+          />
         )}
 
         <FeedFilter currentFilter={filter} onFilterChange={setFilter} />

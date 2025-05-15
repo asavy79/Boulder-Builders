@@ -12,23 +12,31 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const {user_metadata: {first_name, last_name}, id} = user;
+
+
     const { data, error } = await supabase.from('posts').insert({
         title,
         content,
         type,
         user_id: user.id,
-    });
+    }).select();
 
     if (error) {
         return NextResponse.json({ error: "Error adding post" }, { status: 500 });
     }
 
-    return NextResponse.json({ message: "Post added successfully", postData: data }, { status: 200 });
+    const post = data[0];
+
+    const postData = {...post, profiles: {first_name, last_name, user_id: id}} 
+
+    return NextResponse.json({ message: "Post added successfully", postData}, { status: 200 });
 
 }
 
 export async function GET() {
     const supabase = await createClient();
+
 
     const { data, error } = await supabase
         .from('posts')
