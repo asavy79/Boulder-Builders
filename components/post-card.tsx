@@ -3,16 +3,21 @@ import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { Post } from "@/lib/types/post";
 import CommentSection from "@/components/comment-section";
+import { useSupabase } from "@/lib/supabase-context";
 
 interface PostCardProps {
   initialPost: Post;
+  handleDeletedPost: (postId: string) => void;
 }
 
-export default function PostCard({ initialPost }: PostCardProps) {
+export default function PostCard({
+  initialPost,
+  handleDeletedPost,
+}: PostCardProps) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
   const [post, setPost] = useState(initialPost);
-  console.log(post);
+  const { user, loading } = useSupabase();
 
   const handleCommentAdded = () => {
     setPost((prev_post) => ({
@@ -41,7 +46,9 @@ export default function PostCard({ initialPost }: PostCardProps) {
           /> */}
           <div className="ml-3">
             <h3 className="font-medium text-gray-900">
-              {post.profiles.first_name} {post.profiles.last_name}
+              <a href={`/profile/${post.profiles.id}`}>
+                {post.profiles.first_name} {post.profiles.last_name}
+              </a>
             </h3>
             <p className="text-sm text-gray-500">
               {formatDistanceToNow(new Date(post.created_at))} ago
@@ -74,6 +81,9 @@ export default function PostCard({ initialPost }: PostCardProps) {
           <button className="text-sm text-emerald-600 hover:text-emerald-700">
             Collaborate
           </button>
+          {post.profiles.id === user?.id && (
+            <button onClick={() => handleDeletedPost(post.id)}>&times;</button>
+          )}
         </div>
       </div>
 

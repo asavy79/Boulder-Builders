@@ -144,6 +144,21 @@ export default function Feed() {
     );
   }
 
+  const handleDeletedPost = async (postId: string) => {
+    const response = await fetch(`/api/posts/${postId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch("/api/posts", {
@@ -190,7 +205,11 @@ export default function Feed() {
             {posts
               .filter((post) => filter === "all" || post.type === filter)
               .map((post) => (
-                <PostCard key={post.id} initialPost={post} />
+                <PostCard
+                  key={post.id}
+                  initialPost={post}
+                  handleDeletedPost={handleDeletedPost}
+                />
               ))}
           </div>
         )}

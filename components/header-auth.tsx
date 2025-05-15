@@ -2,7 +2,10 @@ import { signOutAction } from "@/app/actions";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
-import {UserCircleIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
+import {
+  UserCircleIcon,
+  InboxArrowDownIcon,
+} from "@heroicons/react/24/outline";
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -13,7 +16,7 @@ export default async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <Link href="/profile">
+      <Link href={`/profile/${user.id}`}>
         <UserCircleIcon className="w-6 h-6 hover:text-emerald-600 transition-colors duration-200" />
       </Link>
       <Link href="/messages">
