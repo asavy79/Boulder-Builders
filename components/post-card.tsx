@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Post } from "@/lib/types/post";
 import CommentSection from "@/components/comment-section";
 import { useSupabase } from "@/lib/supabase-context";
+import { Heart } from "lucide-react";
 
 interface PostCardProps {
   initialPost: Post;
@@ -15,8 +16,8 @@ export default function PostCard({
   handleDeletedPost,
 }: PostCardProps) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-
   const [post, setPost] = useState(initialPost);
+  const [isLiked, setIsLiked] = useState(initialPost.liked);
   const { user, loading } = useSupabase();
 
   const handleCommentAdded = () => {
@@ -31,6 +32,32 @@ export default function PostCard({
       ...prev_post,
       comment_count: prev_post.comment_count - 1,
     }));
+  };
+
+  const handleLike = async () => {
+    if (!user) return;
+
+    try {
+      const method = isLiked ? "DELETE" : "POST";
+      const response = await fetch(`/api/posts/${post.id}/likes`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to update like");
+
+      setPost((prev_post) => ({
+        ...prev_post,
+        like_count: isLiked
+          ? prev_post.like_count - 1
+          : prev_post.like_count + 1,
+      }));
+      setIsLiked(!isLiked);
+    } catch (error) {
+      console.error("Error updating like:", error);
+    }
   };
 
   return (
@@ -72,6 +99,17 @@ export default function PostCard({
         )}
 
         <div className="mt-4 flex items-center space-x-4">
+          <button
+            onClick={handleLike}
+            className={`flex items-center gap-1 text-sm transition-colors ${
+              isLiked
+                ? "text-emerald-600 hover:text-emerald-700"
+                : "text-gray-500 hover:text-emerald-600"
+            }`}
+          >
+            <Heart size={18} className={isLiked ? "fill-current" : ""} />
+            <span>{post.like_count} likes</span>
+          </button>
           <button
             onClick={() => setIsCommentsOpen(!isCommentsOpen)}
             className="text-sm text-emerald-600 hover:text-emerald-700"

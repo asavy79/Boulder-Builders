@@ -187,7 +187,6 @@ export default function Feed() {
 
       const data = await response.json();
       setPosts(data.posts);
-      console.log("Posts fetched successfully:", data.posts);
       setIsLoading(false);
     };
 

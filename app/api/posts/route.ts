@@ -38,6 +38,15 @@ export async function GET() {
     const supabase = await createClient();
 
 
+    const {data: {user}} = await supabase.auth.getUser()
+
+
+    if(!user) {
+        return NextResponse.json({message: "Not authorized"}, {status: 401});
+    }
+    const userId = user.id;
+
+
     const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -52,5 +61,23 @@ export async function GET() {
         console.error('Error fetching posts:', error);
         return NextResponse.json({ error: "Error fetching posts" }, { status: 500 });
     }
-    return NextResponse.json({ posts: data }, { status: 200 });
+
+    const { data: likedRows, error: likesError } = await supabase
+    .from('post_likes')
+    .select('post_id')
+    .eq('user_id', userId);
+
+  if (likesError) {
+    console.error('Error fetching likes:', likesError);
+    return NextResponse.json({ error: "Error fetching likes" }, { status: 500 });
+  }
+
+  const likedSet = new Set(likedRows.map(row => row.post_id));
+  const postsWithLikedFlag = data.map(post => ({
+    ...post,
+    liked: likedSet.has(post.id)
+  }));
+
+  console.log(postsWithLikedFlag)
+    return NextResponse.json({ posts: postsWithLikedFlag }, { status: 200 });
 }

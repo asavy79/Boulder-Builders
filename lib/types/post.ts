@@ -12,6 +12,7 @@ export interface Post {
     };
     comment_count: number,
     like_count: number,
+    liked: boolean,
 }
 
 export interface Comment {
