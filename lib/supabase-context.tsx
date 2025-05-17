@@ -7,6 +7,7 @@ import { User } from "@supabase/supabase-js";
 type SupabaseContextType = {
   user: User | null;
   loading: boolean;
+  supabase: typeof supabase;
 };
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(
@@ -21,10 +22,12 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error getting initial session:', error);
+        console.error("Error getting initial session:", error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -38,7 +41,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
-      if (event === 'SIGNED_OUT') {
+      if (event === "SIGNED_OUT") {
         setUser(null);
       } else {
         setUser(session?.user ?? null);
@@ -52,7 +55,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <SupabaseContext.Provider value={{ user, loading }}>
+    <SupabaseContext.Provider value={{ supabase, user, loading }}>
       {children}
     </SupabaseContext.Provider>
   );
