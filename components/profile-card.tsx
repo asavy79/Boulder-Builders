@@ -26,6 +26,11 @@ export default function ProfileCard({ userId }: ProfileCardProps) {
 
   const { user, loading } = useSupabase();
 
+  const redirectToMessage = (userId: string) => {
+    window.location.href = `/messages/${userId}`;
+    return;
+  };
+
   useEffect(() => {
     const fetchSkills = async () => {
       const response = await fetch(`/api/users/profiles/${userId}`, {
@@ -94,6 +99,16 @@ export default function ProfileCard({ userId }: ProfileCardProps) {
             Boulder
           </Badge>
         </div>
+        {user?.id !== userDetails.id && (
+          <div className="flex flex-col items-center">
+            <Button
+              onClick={() => redirectToMessage(userDetails.id)}
+            variant="auth"
+          >
+            Message
+            </Button>
+          </div>
+        )}
         {user?.id === userDetails.id && (
           <div className="flex justify-center gap-4">
             <Link href="/protected/profile">

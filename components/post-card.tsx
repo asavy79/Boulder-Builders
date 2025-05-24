@@ -37,6 +37,17 @@ export default function PostCard({
   const handleLike = async () => {
     if (!user) return;
 
+    const optimisticLiked = !isLiked;
+
+    setIsLiked(optimisticLiked);
+
+    setPost((prev_post) => ({
+      ...prev_post,
+      like_count: isLiked ? prev_post.like_count - 1 : prev_post.like_count + 1,
+    }));
+
+    const prevPostLikeCount = post.like_count;
+
     try {
       const method = isLiked ? "DELETE" : "POST";
       const response = await fetch(`/api/posts/${post.id}/likes`, {
@@ -46,15 +57,15 @@ export default function PostCard({
         },
       });
 
-      if (!response.ok) throw new Error("Failed to update like");
-
-      setPost((prev_post) => ({
-        ...prev_post,
-        like_count: isLiked
-          ? prev_post.like_count - 1
-          : prev_post.like_count + 1,
-      }));
-      setIsLiked(!isLiked);
+      if (!response.ok) {
+        console.log("Failed to react to post");
+        setIsLiked(!optimisticLiked);
+        setPost((prev_post) => ({
+          ...prev_post,
+          like_count: prevPostLikeCount,
+        }));
+        return;
+      }
     } catch (error) {
       console.error("Error updating like:", error);
     }
