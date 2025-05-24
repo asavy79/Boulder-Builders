@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSupabase } from "@/lib/supabase-context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
   const { supabase, user, loading } = useSupabase();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (loading || !user) {
@@ -46,8 +48,10 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
           filter: `receiver_id=eq.${user.id}`,
         },
         (payload) => {
-
-          if(payload.new.sender_id === userId && payload.new.receiver_id === user.id) {
+          if (
+            payload.new.sender_id === userId &&
+            payload.new.receiver_id === user.id
+          ) {
             console.log("SETTING A MESSAGE SENT BY USER", payload.new);
             setMessages((current) => [...current, payload.new as Message]);
           }
@@ -61,6 +65,10 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
       supabase.removeChannel(channel);
     };
   }, [supabase, user, loading, userId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,14 +96,16 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
 
     console.log(messageData);
 
-
-    setMessages((current) => [...current, {
-      id: messageId,
-      content: newMessage,
-      sender_id: user?.id || "",
-      receiver_id: userId,
-      reated_at: new Date().toISOString(),
-    }]);
+    setMessages((current) => [
+      ...current,
+      {
+        id: messageId,
+        content: newMessage,
+        sender_id: user?.id || "",
+        receiver_id: userId,
+        reated_at: new Date().toISOString(),
+      },
+    ]);
 
     setNewMessage("");
   };
@@ -113,24 +123,25 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
       <div className="p-4 border-b border-gray-100">
         <h1 className="text-xl font-semibold text-gray-800">Messages</h1>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
-          <Card
-            key={message.id}
-            className={`max-w-[80%] ${
-              message.sender_id === user?.id
-                ? "ml-auto bg-emerald-50 border-emerald-100"
-                : "mr-auto bg-gray-50"
-            }`}
-          >
-            <CardContent className="p-3">
-              <p className="text-sm text-gray-800">{message.content}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                {new Date(message.reated_at).toLocaleString()}
-              </p>
-            </CardContent>
-          </Card>
+          <div key={message.id} ref={bottomRef}>
+            <Card
+              className={`max-w-[80%] ${
+                message.sender_id === user?.id
+                  ? "ml-auto bg-emerald-50 border-emerald-100"
+                  : "mr-auto bg-gray-50"
+              }`}
+            >
+              <CardContent className="p-3">
+                <p className="text-sm text-gray-800">{message.content}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {new Date(message.reated_at).toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         ))}
       </div>
 
