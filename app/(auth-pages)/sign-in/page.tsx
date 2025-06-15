@@ -6,11 +6,9 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
 import { signInClient } from "@/utils/supabase/client-auth";
-import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function Login(props: { searchParams: Promise<Message> }) {
-  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
