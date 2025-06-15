@@ -3,7 +3,7 @@ import ProfileCard from "@/components/profile-card";
 export default async function Profile({
   params,
 }: {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
   console.log("USER ID: ", userId);
