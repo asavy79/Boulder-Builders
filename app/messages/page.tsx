@@ -9,6 +9,8 @@ interface Chat {
   user2_id: string;
   created_at: string;
   last_message: string | null;
+  user1_name: string;
+  user2_name: string;
 }
 
 export default function MessagePage() {
@@ -70,10 +72,10 @@ export default function MessagePage() {
                       : "hover:bg-gray-50"
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {chat.user2_id}
+                        {chat.user2_name}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
                         {chat.last_message || "No messages yet"}
