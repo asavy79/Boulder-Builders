@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const supabase = await createClient();
 
@@ -25,9 +25,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 }
 
+// { params }: { params: Promise<{ userId: string }> }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
+    console.log("ID: ", id);
     const supabase = await createClient();
 
     const user = await supabase.auth.getUser();
@@ -39,8 +41,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const { content } = await request.json();
 
 
-        // First fetch the current post data
-        const { data: currentPost, error: fetchError } = await supabase
+    // First fetch the current post data
+    const { data: currentPost, error: fetchError } = await supabase
         .from('posts')
         .select('*')
         .eq('id', id)
@@ -67,26 +69,27 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
 }
 
-export async function DELETE(request: NextRequest, {params}: {params: {commentId: string}}) {
-
-    const { searchParams } = new URL(request.url);
-    const commentId = searchParams.get("commentId")
+export async function DELETE(request: NextRequest) {
+    const commentId = request.nextUrl.searchParams.get('commentId');
     console.log("Comment ID: ", commentId);
+
+    if (!commentId) {
+        return NextResponse.json({ error: "Comment ID is required" }, { status: 400 });
+    }
 
     const supabase = await createClient();
 
     const user = await supabase.auth.getUser();
 
-    if(!user) {
-        return NextResponse.json({error: "User not authorized"}, {status: 500});
+    if (!user) {
+        return NextResponse.json({ error: "User not authorized" }, { status: 401 });
     }
 
-    const {data, error} = await supabase.from('comments').delete().eq('id', commentId);
-    console.log(error);
+    const { data, error } = await supabase.from('comments').delete().eq('id', commentId);
 
-    if(error) {
-        return NextResponse.json({error}, {status: 500});
+    if (error) {
+        return NextResponse.json({ error }, { status: 500 });
     }
 
-    return NextResponse.json(data, {status: 200});
+    return NextResponse.json(data, { status: 200 });
 }
