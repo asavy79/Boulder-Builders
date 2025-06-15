@@ -110,6 +110,25 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
     setNewMessage("");
   };
 
+  const deleteMessage = async (messageId: string) => {
+    const response = await fetch("/api/messages", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messageId,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Failed to delete message");
+      return;
+    }
+
+    setMessages((current) => current.filter((message) => message.id !== messageId));
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -128,12 +147,22 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
         {messages.map((message) => (
           <div key={message.id} ref={bottomRef}>
             <Card
-              className={`max-w-[80%] ${
+              className={`max-w-[80%] relative ${
                 message.sender_id === user?.id
                   ? "ml-auto bg-emerald-50 border-emerald-100"
                   : "mr-auto bg-gray-50"
               }`}
             >
+              {message.sender_id === user?.id && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteMessage(message.id)}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white shadow-sm hover:bg-gray-100 text-gray-500 hover:text-red-500"
+                >
+                  ×
+                </Button>
+              )}
               <CardContent className="p-3">
                 <p className="text-sm text-gray-800">{message.content}</p>
                 <p className="text-xs text-gray-500 mt-1">

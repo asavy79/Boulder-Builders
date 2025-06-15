@@ -1,18 +1,19 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getUser } from "@/utils/helpers";
 
 export async function POST(request: NextRequest) {
     const { title, content, type } = await request.json();
 
     const supabase = await createClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser(supabase);
 
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const {user_metadata: {first_name, last_name}, id} = user;
+    const { user_metadata: { first_name, last_name }, id } = user;
 
 
     const { data, error } = await supabase.from('posts').insert({
@@ -28,9 +29,9 @@ export async function POST(request: NextRequest) {
 
     const post = data[0];
 
-    const postData = {...post, profiles: {first_name, last_name, user_id: id}} 
+    const postData = { ...post, profiles: { first_name, last_name, user_id: id } }
 
-    return NextResponse.json({ message: "Post added successfully", postData}, { status: 200 });
+    return NextResponse.json({ message: "Post added successfully", postData }, { status: 200 });
 
 }
 
@@ -38,11 +39,11 @@ export async function GET() {
     const supabase = await createClient();
 
 
-    const {data: {user}} = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
 
-    if(!user) {
-        return NextResponse.json({message: "Not authorized"}, {status: 401});
+    if (!user) {
+        return NextResponse.json({ message: "Not authorized" }, { status: 401 });
     }
     const userId = user.id;
 
@@ -63,21 +64,21 @@ export async function GET() {
     }
 
     const { data: likedRows, error: likesError } = await supabase
-    .from('post_likes')
-    .select('post_id')
-    .eq('user_id', userId);
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', userId);
 
-  if (likesError) {
-    console.error('Error fetching likes:', likesError);
-    return NextResponse.json({ error: "Error fetching likes" }, { status: 500 });
-  }
+    if (likesError) {
+        console.error('Error fetching likes:', likesError);
+        return NextResponse.json({ error: "Error fetching likes" }, { status: 500 });
+    }
 
-  const likedSet = new Set(likedRows.map(row => row.post_id));
-  const postsWithLikedFlag = data.map(post => ({
-    ...post,
-    liked: likedSet.has(post.id)
-  }));
+    const likedSet = new Set(likedRows.map(row => row.post_id));
+    const postsWithLikedFlag = data.map(post => ({
+        ...post,
+        liked: likedSet.has(post.id)
+    }));
 
-  console.log(postsWithLikedFlag)
+    console.log(postsWithLikedFlag)
     return NextResponse.json({ posts: postsWithLikedFlag }, { status: 200 });
 }
