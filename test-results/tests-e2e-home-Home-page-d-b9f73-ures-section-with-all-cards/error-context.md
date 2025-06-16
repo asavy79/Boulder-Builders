@@ -1,0 +1,48 @@
+# Page snapshot
+
+```yaml
+- main:
+  - navigation:
+    - link "🏔️ Boulder Builders":
+      - /url: /
+    - link "Feed":
+      - /url: /feed
+    - link "Projects":
+      - /url: /projects
+    - link "Learn":
+      - /url: /learn
+    - link "Meetups":
+      - /url: /meetups
+    - link "Sign in":
+      - /url: /sign-in
+    - link "Sign up":
+      - /url: /sign-up
+  - heading "Where Boulder's Builders Connect" [level=1]
+  - paragraph: Join a thriving community of developers, creators, and tech enthusiasts in Boulder. Share projects, learn together, and build meaningful connections.
+  - button "Join the Community"
+  - heading "Everything You Need to Connect & Grow" [level=2]
+  - heading "Share Projects" [level=3]
+  - paragraph: Showcase your latest builds and get feedback from fellow developers
+  - heading "Collaborate" [level=3]
+  - paragraph: Find partners for your next project through our messaging system
+  - heading "Learn Together" [level=3]
+  - paragraph: Share and discover new skills with the Boulder tech community
+  - heading "Build Streaks" [level=3]
+  - paragraph: Stay motivated with daily sharing and learning streaks
+  - heading "Ready to Join Boulder's Tech Community?" [level=2]
+  - paragraph: Connect with local developers, share your projects, and be part of something bigger.
+  - button "Get Started Now"
+  - text: © 2025 Boulder Builders •
+  - link "About":
+    - /url: /about
+  - text: •
+  - link "Privacy":
+    - /url: /privacy
+  - link "GitHub":
+    - /url: https://github.com/boulder-builders
+  - link "Twitter":
+    - /url: https://twitter.com/boulderbuilders
+- alert
+- button "Open Next.js Dev Tools":
+  - img
+```
