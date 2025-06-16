@@ -56,29 +56,22 @@ export async function GET() {
                 id,
                 first_name,
                 last_name
+            ),
+            post_likes!left (
+                post_id
             )
-        `);
+        `)
+        .eq('post_likes.user_id', userId);
+
     if (error) {
         console.error('Error fetching posts:', error);
         return NextResponse.json({ error: "Error fetching posts" }, { status: 500 });
     }
 
-    const { data: likedRows, error: likesError } = await supabase
-        .from('post_likes')
-        .select('post_id')
-        .eq('user_id', userId);
-
-    if (likesError) {
-        console.error('Error fetching likes:', likesError);
-        return NextResponse.json({ error: "Error fetching likes" }, { status: 500 });
-    }
-
-    const likedSet = new Set(likedRows.map(row => row.post_id));
     const postsWithLikedFlag = data.map(post => ({
         ...post,
-        liked: likedSet.has(post.id)
+        liked: post.post_likes && post.post_likes.length > 0
     }));
 
-    console.log(postsWithLikedFlag)
     return NextResponse.json({ posts: postsWithLikedFlag }, { status: 200 });
 }
