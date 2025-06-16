@@ -1,5 +1,7 @@
 import Hero from "@/components/hero";
 import { ArrowRightIcon, CodeBracketIcon, UserGroupIcon, FireIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function Home() {
   return (
@@ -15,11 +17,14 @@ export default async function Home() {
               Join a thriving community of developers, creators, and tech enthusiasts in Boulder. 
               Share projects, learn together, and build meaningful connections.
             </p>
-            <button className="bg-emerald-600 text-white px-8 py-3 rounded-full font-medium 
-              hover:bg-emerald-700 transition-colors duration-200 inline-flex items-center gap-2 cursor-pointer">
+            <Link 
+              href="/sign-in"
+              className="bg-emerald-600 text-white px-8 py-3 rounded-full font-medium 
+                hover:bg-emerald-700 transition-colors duration-200 inline-flex items-center gap-2 cursor-pointer"
+            >
               Join the Community
               <ArrowRightIcon className="w-5 h-5" />
-            </button>
+            </Link>
           </div>
         </div>
         
@@ -72,10 +77,10 @@ export default async function Home() {
           <p className="text-emerald-50 mb-8 max-w-2xl mx-auto">
             Connect with local developers, share your projects, and be part of something bigger.
           </p>
-          <button className="bg-white text-emerald-600 px-8 py-3 rounded-full font-medium 
+          <Link href="/sign-in" className="bg-white text-emerald-600 px-8 py-3 rounded-full font-medium 
             hover:bg-emerald-50 transition-colors duration-200">
             Get Started Now
-          </button>
+          </Link>
         </div>
       </section>
     </div>
