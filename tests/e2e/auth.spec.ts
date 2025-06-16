@@ -11,8 +11,8 @@ test.describe("Authentication", () => {
         await expect(page).toHaveURL(/.*sign-in/);
 
         // Fill in sign in form
-        await page.getByLabel("Email").fill("alex.savard20@icloud.com");
-        await page.getByLabel("Password").fill("goober");
+        await page.getByLabel("Email").fill("test@example.com");
+        await page.getByLabel("Password").fill("testpassword");
         await page.getByRole("button", { name: "Sign In" }).click();
 
         // After successful sign in, should be redirected to feed
