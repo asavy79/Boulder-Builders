@@ -13,12 +13,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     const { id } = await params;
 
-    const { data, error } = await supabase.from("posts").delete().eq('id', id);
+    console.log(id);
+
+    const { data, error } = await supabase.from("posts").delete().eq('id', id).select().single();
 
     if (error) {
         return NextResponse.json({ error: "Error deleting post" }, { status: 500 });
     }
 
+    console.log(data);
     return NextResponse.json({}, { status: 200 });
 
 }

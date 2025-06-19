@@ -14,6 +14,6 @@ export const signIn = async (page: Page) => {
 }
 
 export const signOut = async (page: Page) => {
-    await page.goto("http://localhost:3000/sign-out");
+    await page.getByText("Sign Out", { exact: true }).click();
     await expect(page).toHaveURL(/.*sign-in/);
 }
