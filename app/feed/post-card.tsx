@@ -4,7 +4,8 @@ import { formatDistanceToNow } from "date-fns";
 import { Post } from "@/lib/types/post";
 import CommentSection from "@/components/comment-section";
 import { useSupabase } from "@/lib/supabase-context";
-import { Heart } from "lucide-react";
+import { Heart, Edit3, X } from "lucide-react";
+import PostEditCard from "./post-edit-card";
 
 interface PostCardProps {
   initialPost: Post;
@@ -18,6 +19,7 @@ export default function PostCard({
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [post, setPost] = useState(initialPost);
   const [isLiked, setIsLiked] = useState(initialPost.liked);
+  const [isEditing, setIsEditing] = useState(false);
   const { user, loading } = useSupabase();
 
   const handleCommentAdded = () => {
@@ -32,6 +34,29 @@ export default function PostCard({
       ...prev_post,
       comment_count: prev_post.comment_count - 1,
     }));
+  };
+
+  const handleUpdatePost = async (updatedPost: Post) => {
+    try {
+      const response = await fetch(`/api/posts/${post.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(updatedPost),
+      });
+      
+
+      if (!response.ok) {
+        console.log("Failed to update post");
+        setIsEditing(false);
+        return;
+      }
+
+      setPost(updatedPost);
+
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
+   
+    setIsEditing(false);
   };
 
   const handleLike = async () => {
@@ -71,27 +96,61 @@ export default function PostCard({
     }
   };
 
+  if (isEditing) {
+    return (
+      <div className="mb-6">
+        <PostEditCard
+          post={post}
+          handleUpdatePost={handleUpdatePost}
+          onCancel={() => setIsEditing(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <article className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
       <div className="p-6">
-        <div className="flex items-center mb-4">
-          {/* <Image
-            src={post.user.avatar_url ? }
-            alt={post.user.name}
-            width={40}
-            height={40}
-            className="rounded-full"
-          /> */}
-          <div className="ml-3">
-            <h3 className="font-medium text-gray-900">
-              <a href={`/profile/${post.profiles.id}`}>
-                {post.profiles.first_name} {post.profiles.last_name}
-              </a>
-            </h3>
-            <p className="text-sm text-gray-500">
-              {formatDistanceToNow(new Date(post.created_at))} ago
-            </p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            {/* <Image
+              src={post.user.avatar_url ? }
+              alt={post.user.name}
+              width={40}
+              height={40}
+              className="rounded-full"
+            /> */}
+            <div className="ml-3">
+              <h3 className="font-medium text-gray-900">
+                <a href={`/profile/${post.profiles.id}`}>
+                  {post.profiles.first_name} {post.profiles.last_name}
+                </a>
+              </h3>
+              <p className="text-sm text-gray-500">
+                {formatDistanceToNow(new Date(post.created_at))} ago
+              </p>
+            </div>
           </div>
+          
+          {/* Post actions for owner */}
+          {post.profiles.id === user?.id && (
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                title="Edit post"
+              >
+                <Edit3 size={16} />
+              </button>
+              <button
+                onClick={() => handleDeletedPost(post.id)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Delete post"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
         </div>
 
         <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
@@ -130,9 +189,6 @@ export default function PostCard({
           <button className="text-sm text-emerald-600 hover:text-emerald-700">
             Collaborate
           </button>
-          {post.profiles.id === user?.id && (
-            <button onClick={() => handleDeletedPost(post.id)}>&times;</button>
-          )}
         </div>
       </div>
 
