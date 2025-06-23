@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 interface Message {
   id: string;
@@ -13,6 +14,16 @@ interface Message {
   sender_id: string;
   receiver_id: string;
   reated_at: string;
+  sender?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  receiver?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export default function MessagesWithUser({ userId }: { userId: string }) {
@@ -53,7 +64,25 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
             payload.new.receiver_id === user.id
           ) {
             console.log("SETTING A MESSAGE SENT BY USER", payload.new);
-            setMessages((current) => [...current, payload.new as Message]);
+            // Create a message object with the new format
+            const newMessage: Message = {
+              id: payload.new.id,
+              content: payload.new.content,
+              sender_id: payload.new.sender_id,
+              receiver_id: payload.new.receiver_id,
+              reated_at: payload.new.reated_at,
+              sender: {
+                id: payload.new.sender_id,
+                first_name: "", // Will be populated when fetched
+                last_name: "",
+              },
+              receiver: {
+                id: payload.new.receiver_id,
+                first_name: "", // Will be populated when fetched
+                last_name: "",
+              },
+            };
+            setMessages((current) => [...current, newMessage]);
           }
         }
       )
@@ -96,16 +125,26 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
 
     console.log(messageData);
 
-    setMessages((current) => [
-      ...current,
-      {
-        id: messageId,
-        content: newMessage,
-        sender_id: user?.id || "",
-        receiver_id: userId,
-        reated_at: new Date().toISOString(),
+    // Create a new message object with the sender and receiver data
+    const newMessageObj: Message = {
+      id: messageId,
+      content: newMessage,
+      sender_id: user?.id || "",
+      receiver_id: userId,
+      reated_at: new Date().toISOString(),
+      sender: {
+        id: user?.id || "",
+        first_name: user?.user_metadata?.first_name || "",
+        last_name: user?.user_metadata?.last_name || "",
       },
-    ]);
+      receiver: {
+        id: userId,
+        first_name: "", // This will be populated when the message is fetched
+        last_name: "",
+      },
+    };
+
+    setMessages((current) => [...current, newMessageObj]);
 
     setNewMessage("");
   };
@@ -141,6 +180,33 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
     <div className="flex flex-col h-[600px] w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
       <div className="p-4 border-b border-gray-100">
         <h1 className="text-xl font-semibold text-gray-800">Messages</h1>
+      </div>
+
+      {/* Recipient Header */}
+      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-emerald-700">
+                {messages.length > 0 && messages[0].receiver?.first_name && messages[0].receiver?.last_name
+                  ? `${messages[0].receiver.first_name[0]}${messages[0].receiver.last_name[0]}`
+                  : userId.slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <Link 
+                href={`/profile/${userId}`}
+                className="text-sm font-medium text-gray-900 hover:text-emerald-600 transition-colors duration-200"
+              >
+                {messages.length > 0 && messages[0].receiver?.first_name && messages[0].receiver?.last_name
+                  ? `${messages[0].receiver.first_name} ${messages[0].receiver.last_name}`
+                  : "Loading..."}
+              </Link>
+              <p className="text-xs text-gray-500">Click to view profile</p>
+            </div>
+          </div>
+          <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

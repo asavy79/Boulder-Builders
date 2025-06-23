@@ -25,5 +25,22 @@ export async function GET(
         return NextResponse.json({ message: "Error fetching messages", error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    console.log(data[0]);
+    ;
+
+
+    const { data: testData, error: testError } = await supabase
+        .from("messages")
+        .select(`
+            *,
+            sender:profiles!messages_sender_id_profile_fkey(id, first_name, last_name),
+            receiver:profiles!messages_receiver_id_profile_fkey(id, first_name, last_name)
+        `)
+        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`)
+        .order("reated_at", { ascending: true });
+
+    // ... existing code ...
+
+
+    return NextResponse.json(testData);
 }
