@@ -41,6 +41,9 @@ export default function PostCard({
       const response = await fetch(`/api/posts/${post.id}`, {
         method: "PATCH",
         body: JSON.stringify(updatedPost),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       
 

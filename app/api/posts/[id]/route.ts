@@ -15,7 +15,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     console.log(id);
 
-    const { data, error } = await supabase.from("posts").delete().eq('id', id).select().single();
+    const { data, error } = await supabase.from("posts").delete().eq('id', id);
+
 
     if (error) {
         return NextResponse.json({ error: "Error deleting post" }, { status: 500 });
@@ -30,21 +31,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const supabase = await createClient();
 
     const { id } = await params;
+    console.log(id);
 
-    const { title, content, type } = await request.json();
+
 
     const { data: { user } } = await supabase.auth.getUser();
 
+    const { title, content, type } = await request.json();
+    console.log({ title, content, type });
+
+
+    console.log(user);
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data, error } = await supabase.from("posts").update({ title, content, type }).eq('id', id).eq('user_id', user.id).select().single();
+    const { data, error } = await supabase.from("posts").update({ title, content, type }).eq('id', id);
 
     if (error) {
         console.log(error);
         return NextResponse.json({ error: "Error updating post" }, { status: 500 });
     }
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json({ message: "Post updated successfully" }, { status: 200 });
 }
