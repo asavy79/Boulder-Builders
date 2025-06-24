@@ -26,12 +26,20 @@ interface Message {
   };
 }
 
+const getUserInitials = (user: {id: string, first_name: string, last_name: string} | undefined) => {
+  if (user?.first_name && user?.last_name) {
+    return `${user.first_name[0]}${user.last_name[0]}`;
+  }
+  return "";
+}
+
 export default function MessagesWithUser({ userId }: { userId: string }) {
   const { supabase, user, loading } = useSupabase();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
   const bottomRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     if (loading || !user) {
@@ -188,9 +196,7 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
               <span className="text-sm font-medium text-emerald-700">
-                {messages.length > 0 && messages[0].receiver?.first_name && messages[0].receiver?.last_name
-                  ? `${messages[0].receiver.first_name[0]}${messages[0].receiver.last_name[0]}`
-                  : userId.slice(0, 2).toUpperCase()}
+                {getUserInitials(messages.length > 0 ? messages[0].receiver : undefined)}
               </span>
             </div>
             <div>
