@@ -1,5 +1,4 @@
-
-import MessagesWithUser from "@/components/user-message-box";
+import MessagesWithUser from "@/app/messages/user-message-box";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -10,9 +9,11 @@ export default async function MessageBox({
 }) {
   const { userId } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if(user?.id === userId) {
+  if (user?.id === userId) {
     redirect("/messages");
   }
 
@@ -22,4 +23,3 @@ export default async function MessageBox({
     </div>
   );
 }
-
