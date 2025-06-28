@@ -132,6 +132,11 @@ export default function MessagePage() {
               ))}
             </div>
           </div>
+          {error && (
+            <div className="text-red-500">
+              An error occurred while loading the messages
+            </div>
+          )}
 
           {/* Chat Messages Area */}
           <div className="flex-1">

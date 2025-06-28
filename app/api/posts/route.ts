@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const post = data[0];
 
-    const postData = { ...post, profiles: { first_name, last_name, user_id: id } }
+    const postData = { ...post, profiles: { first_name, last_name, id: id } }
 
     return NextResponse.json({ message: "Post added successfully", postData }, { status: 200 });
 
