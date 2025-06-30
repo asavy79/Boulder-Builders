@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSupabase } from "@/lib/supabase-context";
-import MessagesWithUser from "@/app/messages/user-message-box";
+import MessagesWithUser from "@/app/messages/components/user-message-box";
 
 interface Chat {
   id: string;

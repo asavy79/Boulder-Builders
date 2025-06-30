@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "./ui/button";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Badge } from "./ui/badge";
-import { Card, CardContent, CardHeader } from "./ui/card";
+import { Button } from "../../../components/ui/button";
+import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { Badge } from "../../../components/ui/badge";
+import { Card, CardContent, CardHeader } from "../../../components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSupabase } from "@/lib/supabase-context";
@@ -103,9 +103,9 @@ export default function ProfileCard({ userId }: ProfileCardProps) {
           <div className="flex flex-col items-center">
             <Button
               onClick={() => redirectToMessage(userDetails.id)}
-            variant="auth"
-          >
-            Message
+              variant="auth"
+            >
+              Message
             </Button>
           </div>
         )}

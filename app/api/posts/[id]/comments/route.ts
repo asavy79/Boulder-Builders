@@ -12,11 +12,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('post_id', id);
+    .from('comments')
+    .select(`
+      *,
+      profiles (
+        id,
+        first_name,
+        last_name
+      )
+    `)
+    .eq('post_id', id);
+
+    console.log(data);
 
     if (error) {
+        console.log(error);
         return NextResponse.json({ error: "Error fetching comments" }, { status: 500 });
     }
 
@@ -65,8 +75,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         return NextResponse.json({ error: "Error adding comment" }, { status: 500 });
     }
 
-    return NextResponse.json(data, { status: 200 });
-
+    return NextResponse.json({...data[0], profiles: {id: user?.data?.user?.id, first_name: user?.data?.user?.user_metadata?.first_name, last_name: user?.data?.user?.user_metadata?.last_name}}, { status: 200 });
 }
 
 export async function DELETE(request: NextRequest) {

@@ -22,4 +22,9 @@ export interface Comment {
     user_id: string;
     post_id: string;
     parent_id: string | null;
+    profiles: {
+        id: string,
+        last_name: string,
+        first_name: string
+    }
 }

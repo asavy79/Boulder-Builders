@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import PostCard from "@/components/post-card";
-import FeedFilter from "@/components/feed-filter";
+import PostCard from "@/app/feed/components/post-card";
+import FeedFilter from "@/app/feed/components/feed-filter";
 import { Post } from "@/lib/types/post";
-import AddPostForm from "./add-post-form";
+import AddPostForm from "./components/add-post-form";
 
 function NewPostButton({ onClick }: { onClick: (value: boolean) => void }) {
   return (

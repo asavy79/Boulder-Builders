@@ -1,4 +1,4 @@
-import MessagesWithUser from "@/app/messages/user-message-box";
+import MessagesWithUser from "@/app/messages/components/user-message-box";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 

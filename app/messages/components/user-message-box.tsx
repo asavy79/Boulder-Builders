@@ -127,71 +127,79 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    const response = await fetch("/api/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: newMessage,
+          receiver_id: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send message");
+        setError("An error occurred sending message!");
+        setNewMessage("");
+        return;
+      }
+
+      const data = await response.json();
+      const [messageData] = data.data;
+      const messageId = messageData.id;
+
+      // Create a new message object with the sender and receiver data
+      const newMessageObj: Message = {
+        id: messageId,
         content: newMessage,
+        sender_id: user?.id || "",
         receiver_id: userId,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("Failed to send message");
-      return;
+        reated_at: new Date().toISOString(),
+        sender: {
+          id: user?.id || "",
+          first_name: user?.user_metadata?.first_name || "",
+          last_name: user?.user_metadata?.last_name || "",
+        },
+        receiver: {
+          id: userId,
+          first_name: "", // This will be populated when the message is fetched
+          last_name: "",
+        },
+      };
+      setMessages((current) => [...current, newMessageObj]);
+    } catch (err) {
+      setError("An error occurred sending message!");
     }
-
-    const data = await response.json();
-    const [messageData] = data.data;
-    const messageId = messageData.id;
-
-    console.log(messageData);
-
-    // Create a new message object with the sender and receiver data
-    const newMessageObj: Message = {
-      id: messageId,
-      content: newMessage,
-      sender_id: user?.id || "",
-      receiver_id: userId,
-      reated_at: new Date().toISOString(),
-      sender: {
-        id: user?.id || "",
-        first_name: user?.user_metadata?.first_name || "",
-        last_name: user?.user_metadata?.last_name || "",
-      },
-      receiver: {
-        id: userId,
-        first_name: "", // This will be populated when the message is fetched
-        last_name: "",
-      },
-    };
-
-    setMessages((current) => [...current, newMessageObj]);
 
     setNewMessage("");
   };
 
   const deleteMessage = async (messageId: string) => {
-    const response = await fetch("/api/messages", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messageId,
-      }),
-    });
+    setError("");
+    try {
+      const response = await fetch("/api/messages", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messageId,
+        }),
+      });
 
-    if (!response.ok) {
-      console.error("Failed to delete message");
-      return;
+      if (!response.ok) {
+        setError("An error occurred deleting message!");
+        return;
+      }
+
+      setMessages((current) =>
+        current.filter((message) => message.id !== messageId)
+      );
+    } catch (err) {
+      setError("An error occurred deleting message!");
     }
-
-    setMessages((current) =>
-      current.filter((message) => message.id !== messageId)
-    );
   };
 
   if (loading) {

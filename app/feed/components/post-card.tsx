@@ -2,7 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { Post } from "@/lib/types/post";
-import CommentSection from "@/components/comment-section";
+import CommentSection from "@/app/feed/components/comment-section";
 import { useSupabase } from "@/lib/supabase-context";
 import { Heart } from "lucide-react";
 

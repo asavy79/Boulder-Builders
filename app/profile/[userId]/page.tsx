@@ -1,4 +1,4 @@
-import ProfileCard from "@/components/profile-card";
+import ProfileCard from "@/app/profile/components/profile-card";
 
 export default async function Profile({
   params,
