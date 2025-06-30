@@ -26,36 +26,52 @@ interface Message {
   };
 }
 
-const getUserInitials = (user: {id: string, first_name: string, last_name: string} | undefined) => {
+const getUserInitials = (
+  user: { id: string; first_name: string; last_name: string } | undefined
+) => {
   if (user?.first_name && user?.last_name) {
     return `${user.first_name[0]}${user.last_name[0]}`;
   }
   return "";
-}
+};
 
 export default function MessagesWithUser({ userId }: { userId: string }) {
   const { supabase, user, loading } = useSupabase();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [error, setError] = useState("");
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
-
+  // Fetch messages on load
   useEffect(() => {
     if (loading || !user) {
       return;
     }
 
-    // Fetch existing messages
     const fetchMessages = async () => {
-      const result = await fetch(`/api/messages/${userId}`);
-      const data = await result.json();
-      setMessages(data);
+      try {
+        const result = await fetch(`/api/messages/${userId}`);
+        if (!result.ok) {
+          setError("An error occurred while fetching messages!");
+          return;
+        }
+        const data = await result.json();
+        setMessages(data);
+      } catch (err) {
+        setError("An error occurred while fetching messages!");
+      }
     };
 
     fetchMessages();
+  }, [user, loading, userId]);
 
-    // Subscribe to new messages
+  // Subscribe to new messages
+  useEffect(() => {
+    if (loading || !user) {
+      return;
+    }
+
     const channel = supabase
       .channel("room-messages")
       .on(
@@ -173,8 +189,10 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
       return;
     }
 
-    setMessages((current) => current.filter((message) => message.id !== messageId));
-  }
+    setMessages((current) =>
+      current.filter((message) => message.id !== messageId)
+    );
+  };
 
   if (loading) {
     return (
@@ -196,15 +214,19 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
               <span className="text-sm font-medium text-emerald-700">
-                {getUserInitials(messages.length > 0 ? messages[0].receiver : undefined)}
+                {getUserInitials(
+                  messages.length > 0 ? messages[0].receiver : undefined
+                )}
               </span>
             </div>
             <div>
-              <Link 
+              <Link
                 href={`/profile/${userId}`}
                 className="text-sm font-medium text-gray-900 hover:text-emerald-600 transition-colors duration-200"
               >
-                {messages.length > 0 && messages[0].receiver?.first_name && messages[0].receiver?.last_name
+                {messages.length > 0 &&
+                messages[0].receiver?.first_name &&
+                messages[0].receiver?.last_name
                   ? `${messages[0].receiver.first_name} ${messages[0].receiver.last_name}`
                   : "Loading..."}
               </Link>
@@ -214,7 +236,7 @@ export default function MessagesWithUser({ userId }: { userId: string }) {
           <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
         </div>
       </div>
-
+      {error && <div className="text-red-500">{error}</div>}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div key={message.id} ref={bottomRef}>

@@ -7,7 +7,6 @@ export async function GET(
     { params }: { params: Promise<{ userId: string }> }
 ) {
     const { userId } = await params;
-    console.log("USER ID: ", userId);
 
     const supabase = await createClient();
 
@@ -17,6 +16,7 @@ export async function GET(
         return NextResponse.json({ message: "Not authorized" }, { status: 401 });
     }
 
+    console.log("Retrieved messages!");
 
     const { data, error } = await supabase.from("messages").select("*").or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`).order("reated_at", { ascending: true });
 
@@ -24,10 +24,6 @@ export async function GET(
         console.log(error);
         return NextResponse.json({ message: "Error fetching messages", error: error.message }, { status: 500 });
     }
-
-    console.log(data[0]);
-    ;
-
 
     const { data: testData, error: testError } = await supabase
         .from("messages")
