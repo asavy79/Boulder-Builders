@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
                 name
             )
         `)
-        .eq("user_id", user.data.user.id);
+        .eq("user_id", user.data.user.id).single();
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

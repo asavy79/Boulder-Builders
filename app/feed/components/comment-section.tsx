@@ -6,6 +6,7 @@ import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSupabase } from "@/lib/supabase-context";
+import Link from "next/link";
 
 interface CommentSectionProps {
   postId: string;
@@ -59,6 +60,12 @@ export default function CommentSection({
     e.preventDefault();
     if (!newComment.trim()) return;
 
+    setError(null);
+    setIsLoading(true);
+
+
+    try {
+
     const response = await fetch(`/api/posts/${postId}/comments`, {
       method: "POST",
       headers: {
@@ -77,11 +84,22 @@ export default function CommentSection({
     handleCommentAdded();
 
     setNewComment("");
+
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      setError("Error adding comment");
+      setNewComment("");
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const deleteComment = async (e: React.FormEvent, commentId: string) => {
     e.preventDefault();
+    
 
+    try {
     const response = await fetch(
       `/api/posts/${postId}/comments/?commentId=${commentId}`,
       {
@@ -95,9 +113,17 @@ export default function CommentSection({
       console.log("An error occurred");
       return;
     }
+    else {
+      setComments((prev) => prev.filter((comment) => comment.id != commentId));
+      handleCommentDeleted();
+    }
 
-    setComments((prev) => prev.filter((comment) => comment.id != commentId));
-    handleCommentDeleted();
+  } catch(error) {
+    console.error("Error deleting comment:", error);
+    setError("Error deleting comment");
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   return (
@@ -137,10 +163,13 @@ export default function CommentSection({
                   {/* Comment Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-2">
+                      {/* make this a link to the user's profile */}
+                      <Link href={`/profile/${comment.profiles.id}`}>
                       <h4 className="font-medium text-gray-900 text-sm">
                         {comment.profiles.first_name}{" "}
                         {comment.profiles.last_name}
                       </h4>
+                      </Link>
                       <span className="text-xs text-gray-500">
                         {new Date(comment.created_at).toLocaleDateString(
                           "en-US",

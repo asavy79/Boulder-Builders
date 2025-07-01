@@ -75,7 +75,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         return NextResponse.json({ error: "Error adding comment" }, { status: 500 });
     }
 
-    return NextResponse.json({...data[0], profiles: {id: user?.data?.user?.id, first_name: user?.data?.user?.user_metadata?.first_name, last_name: user?.data?.user?.user_metadata?.last_name}}, { status: 200 });
+    const returnObject = {
+        ...data[0],
+        profiles: 
+            {id: user?.data?.user?.id, 
+            first_name: user?.data?.user?.user_metadata?.first_name, 
+            last_name: user?.data?.user?.user_metadata?.last_name}
+    }
+
+    return NextResponse.json(returnObject, { status: 200 });
 }
 
 export async function DELETE(request: NextRequest) {
