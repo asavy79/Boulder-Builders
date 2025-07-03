@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
+
     const user = await supabase.auth.getUser();
 
     if (!user.data.user) {
@@ -20,9 +21,10 @@ export async function GET(request: NextRequest) {
                 name
             )
         `)
-        .eq("user_id", user.data.user.id).single();
+        .eq("user_id", user.data.user.id);
 
     if (error) {
+        console.log(error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

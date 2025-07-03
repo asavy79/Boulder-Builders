@@ -43,7 +43,6 @@ export default function ProfileEdit({ user }: { user: User }) {
     }
 
     try {
-      // TODO: Implement your update logic here
       if (formData.password !== formData.confirmPassword) {
         console.error("Passwords do not match");
         setError("Passwords do not match");
@@ -60,7 +59,6 @@ export default function ProfileEdit({ user }: { user: User }) {
         throw new Error("Failed to update profile");
       }
 
-      // Refresh the auth state
       await supabase.auth.refreshSession();
       setSuccess("Profile updated successfully");
 
